@@ -1,0 +1,1 @@
+node-gyp rebuild --release --target=%1 --arch=x64 --dist-url=https://atom.io/download/atom-shell && xcopy build\Release\clr.node ..\lib\native\win32\x64\%1\ /Y && node-gyp rebuild --release --target=%1 --arch=ia32 --dist-url=https://atom.io/download/atom-shell && xcopy build\Release\clr.node ..\lib\native\win32\ia32\%1\ /Y

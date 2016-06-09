@@ -1,5 +1,5 @@
 {
-  "name": "clr",
+  "name": "electron-clr",
   "version": "0.0.14",
   "engines": {
     "node": ">=0.12 <5"
@@ -7,15 +7,14 @@
   "description": "Node.js binding for .NET Framework API",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AtsushiSuzuki/node-clr"
+    "url": "https://github.com/victorwins/electron-clr"
   },
   "main": "lib/clr.js",
   "scripts": {
     "test": "mocha"
   },
   "dependencies": {
-    "bindings": "^1.2.1",
-    "nan": "^2.0.9",
+    "nan": "^2.3.5",
     "underscore": "^1.8.3"
   },
   "devDependencies": {

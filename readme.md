@@ -1,3 +1,9 @@
+A fork of node-clr with precomipled Electron native modules.
+
+To build native modules for a new Electron version:
+
+build.cmd <electron version>
+
 # node-clr : .NET Framework API Binding for Node.js
 
 ## Usage:

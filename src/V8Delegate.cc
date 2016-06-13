@@ -16,7 +16,7 @@ V8Delegate::~V8Delegate()
 
 System::Object^ V8Delegate::Invoke(array<System::Object^>^ args)
 {
-	return this->func_->Invoke(args);
+	return this->func_->Invoke(args, nullptr);
 }
 
 System::Delegate^ V8Delegate::CreateDelegate(Local<Function> func)

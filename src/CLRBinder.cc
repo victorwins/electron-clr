@@ -1,4 +1,6 @@
 #include "node-clr.h"
+#include "V8Function.h"
+#include "InterfaceProxy.h"
 
 using namespace v8;
 using namespace System::Collections::Generic;
@@ -6,14 +8,18 @@ using namespace System::Dynamic;
 using namespace System::Linq;
 using namespace System::Reflection;
 
-
 System::Object^ CLRBinder::InvokeConstructor(
 	Local<Value> typeName,
 	Local<Array> args)
 {
 	auto type = System::Type::GetType(ToCLRString(typeName), true);
 
-	return InvokeConstructor(type, args);
+	if(type->IsInterface) {
+	    return DuckTyping(type, args);
+	}
+	else {
+	    return InvokeConstructor(type, args);
+	}
 }
 
 /*
@@ -51,6 +57,44 @@ System::Object^ CLRBinder::InvokeConstructor(
 	}
 }
 
+System::Object^ CLRBinder::DuckTyping(
+	System::Type^ type,
+	v8::Local<Array> args)
+{
+	if (args->Length() != 1)
+	{
+		throw gcnew System::ArgumentException();
+	}
+
+    std::map<std::string, V8Function*>* functions = new std::map<std::string, V8Function*>();
+	auto methods = type->GetMethods();
+
+	auto object = Local<Object>::Cast(args->Get(0));
+	auto names = object->GetOwnPropertyNames();
+
+    System::Console::WriteLine("duck typing for {0}", type);
+
+    int missed = methods->Length;
+	for each (auto method in methods) {
+	    for(auto i=0; i<names->Length(); ++i) {
+			auto name = names->Get(i);
+	        if(method->Name == ToCLRString(name)) {
+	            V8Function* func = V8Function::New(Local<Function>::Cast(object->Get(name)));
+            	std::string sname(*String::Utf8Value(name));
+	            (*functions)[sname] = func;
+	            --missed;
+	            break;
+	        }
+	    }
+	}
+
+    if(missed != 0)
+        System::Console::WriteLine("duck typing for {0} missed {1} methods", type, missed);
+
+	auto proxy = gcnew InterfaceProxy(type, functions);
+	return proxy->GetTransparentProxy();
+}
+
 Local<Value> CLRBinder::InvokeMethod(
 	Local<Value> typeName,
 	Local<Value> name,
@@ -77,7 +121,7 @@ Local<Value> CLRBinder::InvokeMethod(
 	auto methods = type->GetMethods(
 		BindingFlags::Public |
 		((target != nullptr) ? BindingFlags::Instance : BindingFlags::Static));
-	
+
 	auto match = gcnew List<MethodBase^>();
 	for each (auto method in methods)
 	{

@@ -42,9 +42,13 @@ public:
 		v8::Local<v8::Value> value);
 
 private:
-	static System::Object^ CLRBinder::InvokeConstructor(
+	static System::Object^ InvokeConstructor(
 		System::Type^ type,
 		v8::Local<v8::Array> args);
+
+	static System::Object^ DuckTyping(
+        System::Type^ type,
+        v8::Local<v8::Array> args);
 
 	static v8::Local<v8::Value> InvokeMethod(
 		System::Type^ type,

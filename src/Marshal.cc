@@ -78,7 +78,11 @@ System::Object^ ChangeType(
 	// null value
 	if (value.IsEmpty() || value->IsNull() || value->IsUndefined())
 	{
-		if (!type->IsValueType)
+        if(type == System::Void::typeid) {
+			match = EXACT;
+			return nullptr;
+        }
+		else if (!type->IsValueType)
 		{
 			match = EXACT;
 			return nullptr;
@@ -519,7 +523,7 @@ System::Exception^ ToCLRException(Local<Value> ex)
 
 Local<Value> ToV8Error(System::Exception^ ex)
 {
-	auto err = Local<Object>::Cast(Exception::Error(ToV8String(ex->Message)));
+	auto err = Local<Object>::Cast(Exception::Error(ToV8String(ex->ToString())));
 	
 	auto name = ex->GetType()->Name;
 	if (ex->Data["name"] != nullptr)

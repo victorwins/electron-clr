@@ -13,6 +13,7 @@ private:
 		gcroot<System::Object^> result;
 		gcroot<System::Exception^> exception;
 		uv_sem_t completed;
+		gcroot<System::Type^> resultType;
 	};
 
 private:
@@ -25,13 +26,13 @@ private:
 
 public:
 	static V8Function* New(v8::Local<v8::Function> func);
-	System::Object^ Invoke(array<System::Object^>^ args);
+	System::Object^ Invoke(array<System::Object^>^ args, System::Type^ type);
 	void Destroy();
 
 private:
 	V8Function(v8::Local<v8::Function> func);
-	System::Object^ InvokeImpl(array<System::Object^>^ args);
-	System::Object^ InvokeAsync(array<System::Object^>^ args);
+	System::Object^ InvokeImpl(array<System::Object^>^ args, System::Type^ type);
+	System::Object^ InvokeAsync(array<System::Object^>^ args, System::Type^ type);
 	static NAUV_WORK_CB(AsyncCallback);
 	~V8Function();
 };

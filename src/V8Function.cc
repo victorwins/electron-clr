@@ -20,15 +20,15 @@ V8Function::V8Function(Local<Function> func)
 	uv_mutex_init(&this->lock);
 }
 
-System::Object^ V8Function::Invoke(array<System::Object^>^ args)
+System::Object^ V8Function::Invoke(array<System::Object^>^ args, System::Type^ type)
 {
 	if (this->threadId == GetCurrentThreadId())
 	{
-		return this->InvokeImpl(args);
+		return this->InvokeImpl(args, type);
 	}
 	else
 	{
-		return this->InvokeAsync(args);
+		return this->InvokeAsync(args, type);
 	}
 }
 
@@ -47,7 +47,7 @@ V8Function::~V8Function()
 	uv_mutex_destroy(&this->lock);
 }
 
-System::Object^ V8Function::InvokeImpl(array<System::Object^>^ args)
+System::Object^ V8Function::InvokeImpl(array<System::Object^>^ args, System::Type^ type)
 {
 	Nan::HandleScope scope;
 
@@ -67,15 +67,20 @@ System::Object^ V8Function::InvokeImpl(array<System::Object^>^ args)
 			: nullptr);
 	if (trycatch.HasCaught())
 	{
-		throw ToCLRException(trycatch.Exception());
+	    auto exception = ToCLRException(trycatch.Exception());
+        System::Console::WriteLine("V8Function::InvokeImpl exception: {0}", exception);
+		throw exception;
 	}
+
+    if(type != nullptr)
+        return ChangeType(result, type);
 
 	return ToCLRValue(result);
 }
 
-System::Object^ V8Function::InvokeAsync(array<System::Object^>^ args)
+System::Object^ V8Function::InvokeAsync(array<System::Object^>^ args, System::Type^ resultType)
 {
-	InvocationContext ctx = { args };
+	InvocationContext ctx = { args, resultType };
 
 	uv_sem_init(&ctx.completed, 0);
 
@@ -115,7 +120,7 @@ NAUV_WORK_CB(V8Function::AsyncCallback)
 	{
 		try
 		{
-			ctx->result = thiz->InvokeImpl(ctx->args);
+			ctx->result = thiz->InvokeImpl(ctx->args, ctx->resultType);
 		}
 		catch (System::Exception^ ex)
 		{

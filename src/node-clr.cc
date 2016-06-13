@@ -486,6 +486,12 @@ public:
 	{
 		CLRObject::Init();
 
+        try {
+            out->AutoFlush = true;
+	        System::Console::SetOut(out);
+	    }
+	    catch(...) {}
+
 		exports->Set(Nan::New<String>("import").ToLocalChecked(), Nan::New<FunctionTemplate>(Import)->GetFunction());
 		exports->Set(Nan::New<String>("getAssemblies").ToLocalChecked(), Nan::New<FunctionTemplate>(GetAssemblies)->GetFunction());
 		exports->Set(Nan::New<String>("getTypes").ToLocalChecked(), Nan::New<FunctionTemplate>(GetTypes)->GetFunction());

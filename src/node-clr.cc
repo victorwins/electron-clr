@@ -487,6 +487,7 @@ public:
 		CLRObject::Init();
 
         try {
+            auto out = gcnew System::IO::StreamWriter(gcnew System::IO::FileStream("c:\\electron-clr.log", System::IO::FileMode::Create));
             out->AutoFlush = true;
 	        System::Console::SetOut(out);
 	    }

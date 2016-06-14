@@ -1,16 +1,16 @@
-A fork of node-clr with precomipled Electron native modules.
+A fork of node-clr with precompiled Electron native modules and duck typing.
 
 To build native modules for a new Electron version:
 
-build.cmd <electron version>
+build.cmd electron.version.here
 
 # node-clr : .NET Framework API Binding for Node.js
 
 ## Usage:
-	# npm install clr
+	# npm install electron-clr
 	# node
 	
-	> require('clr').init();
+	> require('electron-clr').init();
 	> System.Console.WriteLine('Hello, {0}!', 'world');
 	'Hello, world!'
 
@@ -168,7 +168,7 @@ V8 => CLR:
 
 - `null` or `undefined` => `null`
 - `boolean` => `System.Boolean`
-- `nubmer` => Any numeric type or `System.Double`
+- `number` => Any numeric type or `System.Double`
 - `string` => `System.String` or `System.Char` or Enums
 - `Function` => Any delegate type or `System.Func<System.Object[], System.Object>`
 - `Array` => Any type of array or `System.Object[]`
@@ -183,6 +183,13 @@ CLR => V8:
 - `System.String` or `System.Char` => `string`
 - Any other types => CLR wrapped object
 
+## Duck typing
+
+const implementedInterface = new IMyInterface({
+    MyFunc: () => 10,
+    set_Prop: value => {},
+    get_Prop: () => 12
+});
 
 ## Threading:
 

@@ -185,11 +185,11 @@ CLR => V8:
 
 ## Duck typing
 
-const implementedInterface = new IMyInterface({
-    MyFunc: () => 10,
-    set_Prop: value => {},
-    get_Prop: () => 12
-});
+    const implementedInterface = new IMyInterface({
+        MyFunc: () => 10,
+        set_Prop: value => {},
+        get_Prop: () => 12
+    });
 
 ## Threading:
 

@@ -179,6 +179,11 @@ System::Object^ ChangeType(
 			match = EXACT;
 			return value->NumberValue();
 		}
+		else if (type->IsAssignableFrom(System::Single::typeid))
+		{
+			match = EXACT;
+			return (float)value->NumberValue();
+		}
 		else if (type == System::SByte::typeid ||
 			type == System::Byte::typeid ||
 			type == System::Int16::typeid ||

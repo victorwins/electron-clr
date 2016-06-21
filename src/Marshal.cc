@@ -115,12 +115,20 @@ System::Object^ ChangeType(
 	{
 		if (type->IsAssignableFrom(System::Int32::typeid) ||
 			type == System::Int64::typeid ||
-			type == System::Single::typeid ||
-			type == System::Double::typeid ||
 			type == System::Decimal::typeid)
 		{
 			match = EXACT;
 			return value->Int32Value();
+		}
+		else if (type == System::Single::typeid)
+		{
+			match = EXACT;
+			return (float)value->Int32Value();
+		}
+		else if (type == System::Double::typeid)
+		{
+			match = EXACT;
+			return (double)value->Int32Value();
 		}
 		else if (type == System::SByte::typeid ||
 			type == System::Byte::typeid ||

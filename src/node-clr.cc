@@ -386,7 +386,7 @@ class CLR
 			!info[0]->IsString() ||
 			!info[1]->IsString() ||
 			(!CLRObject::IsCLRObject(info[2]) && info[2]->BooleanValue() != false) ||
-			!info[3].IsEmpty())
+			info[3].IsEmpty())
 		{
 			Nan::ThrowTypeError("Arguments does not match it's parameter list");
 			return;

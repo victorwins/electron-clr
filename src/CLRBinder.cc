@@ -72,8 +72,6 @@ System::Object^ CLRBinder::DuckTyping(
 	auto object = Local<Object>::Cast(args->Get(0));
 	auto names = object->GetOwnPropertyNames();
 
-    System::Console::WriteLine("duck typing for {0}", type);
-
     int missed = methods->Length;
 	for each (auto method in methods) {
 	    for(auto i=0; i<names->Length(); ++i) {
@@ -87,9 +85,6 @@ System::Object^ CLRBinder::DuckTyping(
 	        }
 	    }
 	}
-
-    if(missed != 0)
-        System::Console::WriteLine("duck typing for {0} missed {1} methods", type, missed);
 
 	auto proxy = gcnew InterfaceProxy(type, functions);
 	return proxy->GetTransparentProxy();

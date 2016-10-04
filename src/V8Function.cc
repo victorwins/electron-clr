@@ -68,7 +68,6 @@ System::Object^ V8Function::InvokeImpl(array<System::Object^>^ args, System::Typ
 	if (trycatch.HasCaught())
 	{
 	    auto exception = ToCLRException(trycatch.Exception());
-        System::Console::WriteLine("V8Function::InvokeImpl exception: {0}", exception);
 		throw exception;
 	}
 

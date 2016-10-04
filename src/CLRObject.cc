@@ -12,11 +12,36 @@ void CLRObject::Init()
 	objectTemplate_.Reset(tmpl);
 }
 
+v8::Local<v8::Value> GetPrivate(v8::Local<v8::Object> object,
+                                  v8::Local<v8::String> key) {
+    v8::Isolate* isolate = v8::Isolate::GetCurrent();
+    v8::Local<v8::Context> context = isolate->GetCurrentContext();
+    v8::Local<v8::Private> privateKey = v8::Private::ForApi(isolate, key);
+    v8::Local<v8::Value> value;
+    v8::Maybe<bool> result = object->HasPrivate(context, privateKey);
+    if (!(result.IsJust() && result.FromJust()))
+      return v8::Local<v8::Value>();
+    if (object->GetPrivate(context, privateKey).ToLocal(&value))
+      return value;
+    return v8::Local<v8::Value>();
+  }
+
+  void SetPrivate(v8::Local<v8::Object> object,
+                  v8::Local<v8::String> key,
+                  v8::Local<v8::Value> value) {
+    if (value.IsEmpty())
+      return;
+    v8::Isolate* isolate = v8::Isolate::GetCurrent();
+    v8::Local<v8::Context> context = isolate->GetCurrentContext();
+    v8::Local<v8::Private> privateKey = v8::Private::ForApi(isolate, key);
+    object->SetPrivate(context, privateKey, value);
+  }
+
 bool CLRObject::IsCLRObject(Local<Value> value)
 {
 	if (!value.IsEmpty() && value->IsObject() && !value->IsFunction())
 	{
-		auto type = Local<Object>::Cast(value)->GetHiddenValue(Nan::New<String>("clr::type").ToLocalChecked());
+		auto type = GetPrivate(Local<Object>::Cast(value), Nan::New<String>("clr::type").ToLocalChecked());
 		return !type.IsEmpty();
 	}
 	else
@@ -27,14 +52,14 @@ bool CLRObject::IsCLRObject(Local<Value> value)
 
 Local<Value> CLRObject::GetType(Local<Value> value)
 {
-	return Local<Object>::Cast(value)->GetHiddenValue(Nan::New<String>("clr::type").ToLocalChecked());
+	return GetPrivate(Local<Object>::Cast(value), Nan::New<String>("clr::type").ToLocalChecked());
 }
 
 bool CLRObject::IsCLRConstructor(Local<Value> value)
 {
 	if (!value.IsEmpty() && value->IsFunction())
 	{
-		auto type = value->ToObject()->GetHiddenValue(Nan::New<String>("clr::type").ToLocalChecked());
+		auto type = GetPrivate(value->ToObject(), Nan::New<String>("clr::type").ToLocalChecked());
 		return !type.IsEmpty();
 	}
 	else
@@ -45,7 +70,7 @@ bool CLRObject::IsCLRConstructor(Local<Value> value)
 
 Local<Value> CLRObject::TypeOf(Local<Value> value)
 {
-	return Local<Object>::Cast(value)->GetHiddenValue(Nan::New<String>("clr::type").ToLocalChecked());
+	return GetPrivate(Local<Object>::Cast(value), Nan::New<String>("clr::type").ToLocalChecked());
 }
 
 Local<Object> CLRObject::Wrap(Local<Object> obj, System::Object^ value)
@@ -57,7 +82,7 @@ Local<Object> CLRObject::Wrap(Local<Object> obj, System::Object^ value)
 		? ToV8String(value->GetType()->AssemblyQualifiedName)
 		: ToV8String(System::Object::typeid->AssemblyQualifiedName);
 
-	obj->SetHiddenValue(
+	SetPrivate(obj,
 		Nan::New<String>("clr::type").ToLocalChecked(),
 		name);
 
@@ -91,8 +116,8 @@ Local<Function> CLRObject::CreateConstructor(Local<String> typeName, Local<Funct
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 	
 	auto ctor = tpl->GetFunction();
-	ctor->SetHiddenValue(Nan::New<String>("clr::type").ToLocalChecked(), ToV8String(type->AssemblyQualifiedName));
-	ctor->SetHiddenValue(Nan::New<String>("clr::initializer").ToLocalChecked(), initializer);
+	SetPrivate(ctor, Nan::New<String>("clr::type").ToLocalChecked(), ToV8String(type->AssemblyQualifiedName));
+	SetPrivate(ctor, Nan::New<String>("clr::initializer").ToLocalChecked(), initializer);
 
 	return ctor;
 }
@@ -107,7 +132,7 @@ NAN_METHOD(CLRObject::New)
 	}
 
 	auto ctor = info.Callee();
-	auto typeName = ctor->GetHiddenValue(Nan::New<String>("clr::type").ToLocalChecked());
+	auto typeName = GetPrivate(ctor, Nan::New<String>("clr::type").ToLocalChecked());
 
 	auto arr = Nan::New<Array>();
 	for (int i = 0; i < info.Length(); i++)
@@ -128,7 +153,7 @@ NAN_METHOD(CLRObject::New)
 	
 	Wrap(info.This(), value);
 
-	auto initializer = ctor->GetHiddenValue(Nan::New<String>("clr::initializer").ToLocalChecked());
+	auto initializer = GetPrivate(ctor, Nan::New<String>("clr::initializer").ToLocalChecked());
 	if (!initializer.IsEmpty())
 	{
 		std::vector<Local<Value> > params;

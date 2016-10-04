@@ -43,7 +43,7 @@ public ref class InterfaceProxy : public RealProxy
 
         try
         {
-            System::Console::WriteLine("{0}", method);
+            // System::Console::WriteLine("{0}", method);
             if(method->Name == "GetType")
             {
                 return gcnew ReturnMessage(_type, nullptr, 0, methodCall->LogicalCallContext, methodCall);
@@ -54,7 +54,7 @@ public ref class InterfaceProxy : public RealProxy
             if (found != _instance->end())
             {
                 auto result = found->second->Invoke(methodCall->InArgs, method->ReturnType);
-                System::Console::WriteLine("call {0} => {1}", methodCall->InArgs, result);
+                // System::Console::WriteLine("call {0} => {1}", methodCall->InArgs, result);
                 return gcnew ReturnMessage(result, nullptr, 0, methodCall->LogicalCallContext, methodCall);
             }
             else
@@ -64,7 +64,7 @@ public ref class InterfaceProxy : public RealProxy
         }
         catch (System::Exception^ e)
         {
-            System::Console::WriteLine("failed call {0} => {1}", methodCall->InArgs, e);
+            // System::Console::WriteLine("failed call {0} => {1}", methodCall->InArgs, e);
             if ( dynamic_cast<TargetInvocationException^>(e) != nullptr && e->InnerException != nullptr)
             {
                 return gcnew ReturnMessage(e->InnerException, dynamic_cast<IMethodCallMessage^>(msg));

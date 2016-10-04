@@ -486,12 +486,14 @@ public:
 	{
 		CLRObject::Init();
 
+/*
         try {
             auto out = gcnew System::IO::StreamWriter(gcnew System::IO::FileStream("c:\\electron-clr.log", System::IO::FileMode::Create));
             out->AutoFlush = true;
 	        System::Console::SetOut(out);
 	    }
 	    catch(...) {}
+*/
 
 		exports->Set(Nan::New<String>("import").ToLocalChecked(), Nan::New<FunctionTemplate>(Import)->GetFunction());
 		exports->Set(Nan::New<String>("getAssemblies").ToLocalChecked(), Nan::New<FunctionTemplate>(GetAssemblies)->GetFunction());

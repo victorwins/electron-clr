@@ -241,8 +241,7 @@ System::Object^ ChangeType(
 				return str[0];
 			}
 		}
-		else if (System::Enum::typeid->IsAssignableFrom(type) &&
-			type != System::Enum::typeid)
+		else if (type->IsEnum)
 		{
 			try
 			{
@@ -472,6 +471,12 @@ Local<Value> ToV8Value(System::Object^ value)
 	}
 
 	auto type = value->GetType();
+
+	if (type->IsEnum)
+    {
+        return ToV8String(value->ToString());
+    }
+
 	switch (System::Type::GetTypeCode(type))
 	{
 	case System::TypeCode::Boolean:
@@ -487,10 +492,9 @@ Local<Value> ToV8Value(System::Object^ value)
 	case System::TypeCode::UInt64:
 	case System::TypeCode::Single:
 	case System::TypeCode::Double:
-	// case System::TypeCode::Decimal:
 		if (System::Enum::typeid->IsAssignableFrom(type))
 		{
-			return CLRObject::Wrap(value);
+		    return ToV8String(value->ToString());
 		}
 		else
 		{

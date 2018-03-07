@@ -1,8 +1,7 @@
 {
   "name": "electron-clr",
-  "version": "1.7.12",
   "engines": {
-    "node": ">=0.12 <5"
+    "node": ">=0.12"
   },
   "description": "Electron binding for .NET Framework API",
   "repository": {
@@ -14,7 +13,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "nan": "2.5.*",
+    "nan": "2.9.*",
     "underscore": "^1.8.3"
   },
   "devDependencies": {

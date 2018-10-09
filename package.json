@@ -1,6 +1,6 @@
 {
   "name": "electron-clr",
-  "version": "3.0.0",
+  "version": "2.0.8",
   "engines": {
     "node": ">=0.12"
   },
@@ -14,7 +14,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "nan": "^2.11.1",
+    "nan": "2.9.*",
     "underscore": "^1.8.3"
   },
   "devDependencies": {

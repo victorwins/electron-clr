@@ -41,7 +41,7 @@ bool CLRObject::IsCLRObject(Local<Value> value)
 {
 	if (!value.IsEmpty() && value->IsObject() && !value->IsFunction())
 	{
-	    auto type = GetPrivate(Local<Object>::Cast(value), Nan::New<String>("clr::type").ToLocalChecked());
+		auto type = GetPrivate(Local<Object>::Cast(value), Nan::New<String>("clr::type").ToLocalChecked());
 		return !type.IsEmpty();
 	}
 	else
@@ -59,7 +59,7 @@ bool CLRObject::IsCLRConstructor(Local<Value> value)
 {
 	if (!value.IsEmpty() && value->IsFunction())
 	{
-        auto type = GetPrivate(value->ToObject(), Nan::New<String>("clr::type").ToLocalChecked());
+		auto type = GetPrivate(value->ToObject(), Nan::New<String>("clr::type").ToLocalChecked());
 		return !type.IsEmpty();
 	}
 	else
@@ -111,16 +111,13 @@ Local<Function> CLRObject::CreateConstructor(Local<String> typeName, Local<Funct
 {
 	auto type = System::Type::GetType(ToCLRString(typeName), true);
 
-    auto data = Nan::New<v8::Object>();
-	SetPrivate(data, Nan::New<String>("clr::type").ToLocalChecked(), ToV8String(type->AssemblyQualifiedName));
-	SetPrivate(data, Nan::New<String>("clr::initializer").ToLocalChecked(), initializer);
-
-	auto tpl = Nan::New<FunctionTemplate>(New, data);
+	auto tpl = Nan::New<FunctionTemplate>(New);
 	tpl->SetClassName(ToV8String(type->Name));
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 	
 	auto ctor = tpl->GetFunction();
 	SetPrivate(ctor, Nan::New<String>("clr::type").ToLocalChecked(), ToV8String(type->AssemblyQualifiedName));
+	SetPrivate(ctor, Nan::New<String>("clr::initializer").ToLocalChecked(), initializer);
 
 	return ctor;
 }
@@ -134,7 +131,7 @@ NAN_METHOD(CLRObject::New)
 		return Nan::ThrowError("Illegal invocation");
 	}
 
-	auto ctor = Local<Object>::Cast(info.Data());
+	auto ctor = info.Callee();
 	auto typeName = GetPrivate(ctor, Nan::New<String>("clr::type").ToLocalChecked());
 
 	auto arr = Nan::New<Array>();
@@ -153,6 +150,7 @@ NAN_METHOD(CLRObject::New)
 		Nan::ThrowError(ToV8Error(ex));
 		return;
 	}
+	
 	Wrap(info.This(), value);
 
 	auto initializer = GetPrivate(ctor, Nan::New<String>("clr::initializer").ToLocalChecked());

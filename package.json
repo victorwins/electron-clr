@@ -1,6 +1,6 @@
 {
   "name": "electron-clr",
-  "version": "3.0.2",
+  "version": "3.0.6",
   "engines": {
     "node": ">=0.12"
   },
